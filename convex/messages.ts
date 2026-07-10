@@ -23,13 +23,15 @@ export const list = query({
     messages.sort((a, b) => a._creationTime - b._creationTime);
     return Promise.all(
       messages
+        .filter((message) => !message.expiresAt || message.expiresAt > Date.now())
         // Add the author's name to each message.
         .map(async (message) => {
           const { name, email } = (await ctx.db.get(message.userId))!;
           const attachmentUrl = message.attachment
             ? await ctx.storage.getUrl(message.attachment.storageId)
             : null;
-          return { ...message, author: name ?? email!, attachmentUrl };
+          const reply = message.replyTo ? await ctx.db.get(message.replyTo) : null;
+          return { ...message, author: name ?? email!, attachmentUrl, replyPreview: reply?.deletedAt ? "This message was deleted" : reply?.body ?? null };
         }),
     );
   },
@@ -45,14 +47,56 @@ export const send = mutation({
       contentType: v.string(),
       size: v.number(),
     })),
+    replyTo: v.optional(v.id("messages")),
+    expiresAt: v.optional(v.number()),
   },
-  handler: async (ctx, { body, recipient, attachment }) => {
+  handler: async (ctx, { body, recipient, attachment, replyTo, expiresAt }) => {
     const userId = await auth.getUserId(ctx);
     if (userId === null) {
       throw new Error("Not signed in");
     }
-    // Send a new message.
-    await ctx.db.insert("messages", { body, userId, recipient, attachment });
+    const blocked = await ctx.db.query("blocks").withIndex("by_user", (q) => q.eq("userId", recipient).eq("blockedUserId", userId)).unique();
+    if (blocked) throw new Error("This user is not accepting messages from you");
+    if (attachment && (attachment.size > 25 * 1024 * 1024 || !attachment.contentType.startsWith("image/") && !attachment.contentType.startsWith("video/") && attachment.contentType !== "application/pdf")) {
+      throw new Error("Attachments must be images, videos, or PDFs up to 25 MB");
+    }
+    await ctx.db.insert("messages", { body, userId, recipient, attachment, replyTo, expiresAt });
+  },
+});
+
+export const edit = mutation({
+  args: { messageId: v.id("messages"), body: v.string() },
+  handler: async (ctx, { messageId, body }) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not signed in");
+    const message = await ctx.db.get(messageId);
+    if (!message || message.userId !== userId || message.deletedAt) throw new Error("Cannot edit this message");
+    await ctx.db.patch(messageId, { body, editedAt: Date.now() });
+  },
+});
+
+export const remove = mutation({
+  args: { messageId: v.id("messages") },
+  handler: async (ctx, { messageId }) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not signed in");
+    const message = await ctx.db.get(messageId);
+    if (!message || message.userId !== userId) throw new Error("Cannot delete this message");
+    await ctx.db.patch(messageId, { deletedAt: Date.now(), body: "", attachment: undefined });
+  },
+});
+
+export const toggleReaction = mutation({
+  args: { messageId: v.id("messages"), emoji: v.string() },
+  handler: async (ctx, { messageId, emoji }) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not signed in");
+    const message = await ctx.db.get(messageId);
+    if (!message || (message.userId !== userId && message.recipient !== userId)) throw new Error("Message not found");
+    const reactions = message.reactions ?? [];
+    const index = reactions.findIndex((reaction) => reaction.userId === userId && reaction.emoji === emoji);
+    if (index >= 0) reactions.splice(index, 1); else reactions.push({ userId, emoji });
+    await ctx.db.patch(messageId, { reactions });
   },
 });
 

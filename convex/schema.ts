@@ -19,9 +19,29 @@ export default defineSchema({
     })),
     deliveredAt: v.optional(v.number()),
     readAt: v.optional(v.number()),
-  }).index("sender", ["userId", "recipient"]),
+    editedAt: v.optional(v.number()),
+    deletedAt: v.optional(v.number()),
+    expiresAt: v.optional(v.number()),
+    replyTo: v.optional(v.id("messages")),
+    reactions: v.optional(v.array(v.object({ userId: v.id("users"), emoji: v.string() }))),
+  }).index("sender", ["userId", "recipient"])
+    .index("recipient", ["recipient", "userId"]),
   keys: defineTable({
     userId: v.id("users"),
     key: v.string(),
   }).index("userId", ["userId"]),
+  presence: defineTable({
+    userId: v.id("users"),
+    lastSeen: v.number(),
+    isOnline: v.boolean(),
+  }).index("userId", ["userId"]),
+  typing: defineTable({
+    userId: v.id("users"),
+    recipient: v.id("users"),
+    expiresAt: v.number(),
+  }).index("sender", ["userId", "recipient"]),
+  blocks: defineTable({
+    userId: v.id("users"),
+    blockedUserId: v.id("users"),
+  }).index("by_user", ["userId", "blockedUserId"]),
 });
