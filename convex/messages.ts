@@ -57,8 +57,9 @@ export const send = mutation({
     }
     const blocked = await ctx.db.query("blocks").withIndex("by_user", (q) => q.eq("userId", recipient).eq("blockedUserId", userId)).unique();
     if (blocked) throw new Error("This user is not accepting messages from you");
-    if (attachment && (attachment.size > 25 * 1024 * 1024 || !attachment.contentType.startsWith("image/") && !attachment.contentType.startsWith("video/") && attachment.contentType !== "application/pdf")) {
-      throw new Error("Attachments must be images, videos, or PDFs up to 25 MB");
+    const maxAttachmentSize = attachment?.contentType.startsWith("video/") ? 10 * 1024 * 1024 : 25 * 1024 * 1024;
+    if (attachment && (attachment.size > maxAttachmentSize || !attachment.contentType.startsWith("image/") && !attachment.contentType.startsWith("video/") && attachment.contentType !== "application/pdf")) {
+      throw new Error("Videos are limited to 10 MB. Images and PDFs are limited to 25 MB.");
     }
     await ctx.db.insert("messages", { body, userId, recipient, attachment, replyTo, expiresAt });
   },

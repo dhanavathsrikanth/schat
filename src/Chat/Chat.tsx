@@ -196,7 +196,17 @@ export function EncryptedChat(
             ref={fileInputRef}
             type="file"
             className="hidden"
-            onChange={(event: ChangeEvent<HTMLInputElement>) => setAttachment(event.target.files?.[0] ?? null)}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              const file = event.target.files?.[0] ?? null;
+              const maxSize = file?.type.startsWith("video/") ? 10 * 1024 * 1024 : 25 * 1024 * 1024;
+              if (file && file.size > maxSize) {
+                setSendError(file.type.startsWith("video/") ? "Videos are limited to 10 MB." : "Images and PDFs are limited to 25 MB.");
+                event.target.value = "";
+                return;
+              }
+              setSendError(null);
+              setAttachment(file);
+            }}
           />
           <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} aria-label="Attach a file">
             📎
