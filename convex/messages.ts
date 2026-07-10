@@ -11,13 +11,13 @@ export const list = query({
     const sentMessages = await ctx.db.query("messages")
       .withIndex("sender", q=>q.eq("userId", userId).eq("recipient", recipient))
       .order("desc")
-      .collect();
+      .take(100);
     let messages = sentMessages;
     if (recipient !== userId) {
       const receivedMessages = await ctx.db.query("messages")
         .withIndex("sender", q=>q.eq("userId", recipient).eq("recipient", userId))
         .order("desc")
-        .collect();
+        .take(100);
       messages = [...sentMessages, ...receivedMessages];
     }
     messages.sort((a, b) => a._creationTime - b._creationTime);
@@ -55,6 +55,13 @@ export const send = mutation({
     if (userId === null) {
       throw new Error("Not signed in");
     }
+    const recentMessages = await ctx.db.query("messages")
+      .withIndex("by_sender", (q) => q.eq("userId", userId))
+      .order("desc")
+      .take(31);
+    if (recentMessages.filter((message) => message._creationTime > Date.now() - 60_000).length >= 30) {
+      throw new Error("Message limit reached. Please wait a minute before sending more messages.");
+    }
     const blocked = await ctx.db.query("blocks").withIndex("by_user", (q) => q.eq("userId", recipient).eq("blockedUserId", userId)).unique();
     if (blocked) throw new Error("This user is not accepting messages from you");
     const maxAttachmentSize = attachment?.contentType.startsWith("video/") ? 10 * 1024 * 1024 : 25 * 1024 * 1024;
@@ -83,6 +90,7 @@ export const remove = mutation({
     if (!userId) throw new Error("Not signed in");
     const message = await ctx.db.get(messageId);
     if (!message || message.userId !== userId) throw new Error("Cannot delete this message");
+    if (message.attachment) await ctx.storage.delete(message.attachment.storageId);
     await ctx.db.patch(messageId, { deletedAt: Date.now(), body: "", attachment: undefined });
   },
 });

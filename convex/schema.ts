@@ -25,7 +25,8 @@ export default defineSchema({
     replyTo: v.optional(v.id("messages")),
     reactions: v.optional(v.array(v.object({ userId: v.id("users"), emoji: v.string() }))),
   }).index("sender", ["userId", "recipient"])
-    .index("recipient", ["recipient", "userId"]),
+    .index("recipient", ["recipient", "userId"])
+    .index("by_sender", ["userId"]),
   keys: defineTable({
     userId: v.id("users"),
     key: v.string(),

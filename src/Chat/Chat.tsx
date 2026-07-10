@@ -19,7 +19,7 @@ export function MultiChat({ viewer }: { viewer: Id<"users"> }) {
 
   useEffect(() => {
     void heartbeat({ isOnline: true });
-    const interval = window.setInterval(() => void heartbeat({ isOnline: true }), 30_000);
+    const interval = window.setInterval(() => void heartbeat({ isOnline: true }), 5 * 60_000);
     const offline = () => void heartbeat({ isOnline: false });
     window.addEventListener("beforeunload", offline);
     return () => { window.clearInterval(interval); window.removeEventListener("beforeunload", offline); };
@@ -107,6 +107,7 @@ export function EncryptedChat(
   const [sendError, setSendError] = useState<string | null>(null);
   const [expiresIn, setExpiresIn] = useState(0);
   const [replyTo, setReplyTo] = useState<Id<"messages"> | null>(null);
+  const typingTimeoutRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const latestMessageRef = useRef<string | null>(null);
 
@@ -151,6 +152,7 @@ export function EncryptedChat(
           };
         }
         await sendMessage({ body: encryptedBody, recipient, attachment: uploadedAttachment, replyTo: replyTo ?? undefined, expiresAt: expiresIn ? Date.now() + expiresIn : undefined });
+        void setTyping({ recipient, isTyping: false });
         setNewMessageText("");
         setAttachment(null);
         setReplyTo(null);
@@ -214,7 +216,14 @@ export function EncryptedChat(
           {"Notification" in window && Notification.permission !== "granted" && <Button type="button" variant="outline" onClick={() => void Notification.requestPermission()} aria-label="Enable notifications">🔔</Button>}
           <Input
             value={newMessageText}
-            onChange={(event) => { setNewMessageText(event.target.value); void setTyping({ recipient, isTyping: event.target.value.length > 0 }); }}
+            onChange={(event) => {
+              setNewMessageText(event.target.value);
+              if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current);
+              if (event.target.value.length > 0) {
+                void setTyping({ recipient, isTyping: true });
+                typingTimeoutRef.current = window.setTimeout(() => void setTyping({ recipient, isTyping: false }), 3_000);
+              } else void setTyping({ recipient, isTyping: false });
+            }}
             placeholder={replyTo ? "Replying to a message…" : attachment ? `Attached: ${attachment.name}` : "Write a message…"}
             disabled={blocked}
           />
