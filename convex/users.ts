@@ -9,7 +9,14 @@ export const viewer = query({
     if (!userId) return null;
     const user = await ctx.db.get(userId);
     const profile = await ctx.db.query("profiles").withIndex("by_user", (q) => q.eq("userId", userId)).unique();
-    return user ? { ...user, handle: profile?.handle ?? null, about: profile?.about ?? null, avatarUrl: profile?.avatarUrl ?? null } : null;
+    const account = await ctx.db.query("authAccounts").withIndex("userIdAndProvider", (q) => q.eq("userId", userId)).first();
+    return user ? {
+      ...user,
+      handle: profile?.handle ?? null,
+      about: profile?.about ?? null,
+      avatarUrl: profile?.avatarUrl ?? null,
+      authProvider: account?.provider ?? null,
+    } : null;
   },
 });
 
@@ -32,6 +39,7 @@ export const list = query({
       const presence = await ctx.db.query("presence")
         .withIndex("userId", (q) => q.eq("userId", doc._id))
         .unique();
+      const account = await ctx.db.query("authAccounts").withIndex("userIdAndProvider", (q) => q.eq("userId", doc._id)).first();
       return {
       _id: doc._id,
       name: doc.name,
@@ -41,6 +49,7 @@ export const list = query({
       avatarUrl: profile?.avatarUrl ?? null,
       isOnline: presence?.isOnline && presence.lastSeen > Date.now() - 60_000,
       lastSeen: presence?.lastSeen ?? null,
+      authProvider: account?.provider ?? null,
       };
     }));
   },

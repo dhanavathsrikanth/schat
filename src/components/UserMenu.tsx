@@ -14,10 +14,17 @@ import { ReactNode, useState } from "react";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { ShareDialog } from "@/components/ShareDialog";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
+const PROVIDER_LABELS: Record<string, string> = {
+  google: "Google",
+  github: "GitHub",
+  "resend-otp": "Email",
+};
+
 export function UserMenu({ children }: { children: ReactNode }) {
+  const user = useQuery(api.users.viewer);
   const { subscribe, unsubscribe } = usePushNotifications();
   const [pushEnabled, setPushEnabled] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -42,6 +49,13 @@ export function UserMenu({ children }: { children: ReactNode }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>{children}</DropdownMenuLabel>
+          {user?.authProvider && (
+            <div className="px-2 pb-1">
+              <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                Signed in with {PROVIDER_LABELS[user.authProvider] ?? user.authProvider}
+              </span>
+            </div>
+          )}
           <DropdownMenuSeparator />
           <ProfileEditor>
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

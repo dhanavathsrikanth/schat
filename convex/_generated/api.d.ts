@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as ResendOTP from "../ResendOTP.js";
 import type * as auth from "../auth.js";
 import type * as cron from "../cron.js";
 import type * as crons from "../crons.js";
@@ -25,6 +26,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  ResendOTP: typeof ResendOTP;
   auth: typeof auth;
   cron: typeof cron;
   crons: typeof crons;
