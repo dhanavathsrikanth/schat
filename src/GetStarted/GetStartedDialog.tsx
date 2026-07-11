@@ -1,5 +1,3 @@
-import { ConvexLogo } from "@/GetStarted/ConvexLogo";
-import { Code } from "@/components/Code";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -12,11 +10,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  CodeIcon,
   ExternalLinkIcon,
-  MagicWandIcon,
-  PlayIcon,
-  StackIcon,
+  PersonIcon,
+  LockClosedIcon,
+  ChatBubbleIcon,
 } from "@radix-ui/react-icons";
 import { ReactNode } from "react";
 
@@ -26,9 +23,7 @@ export function GetStartedDialog({ children }: { children: ReactNode }) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[calc(100vh-8rem)] grid-rows-[1fr_auto]">
         <DialogHeader>
-          <DialogTitle className="flex items-baseline gap-2">
-            Your app powered by <ConvexLogo width={69} height={11} />
-          </DialogTitle>
+          <DialogTitle>Welcome to s.chat</DialogTitle>
         </DialogHeader>
         <GetStartedContent />
         <DialogFooter>
@@ -44,107 +39,61 @@ export function GetStartedDialog({ children }: { children: ReactNode }) {
 function GetStartedContent() {
   return (
     <div className="overflow-y-auto">
-      <p className="text-muted-foreground mb-2">
-        This template is a starting point for building your fullstack web
-        application.
+      <p className="text-muted-foreground mb-4">
+        End-to-end encrypted messaging. Only you and the recipient can read your messages.
       </p>
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="flex gap-2">
-              <PlayIcon /> Play with the app
+            <CardTitle className="flex gap-2 text-base">
+              <PersonIcon /> Choose a Username
             </CardTitle>
           </CardHeader>
-          <CardContent>Close this dialog to see the app in action.</CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex gap-2">
-              <StackIcon /> Inspect your database
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            The{" "}
-            <a
-              href="https://dashboard.convex.dev/"
-              className="underline underline-offset-4 hover:no-underline"
-              target="_blank"
-            >
-              Convex dashboard
-            </a>{" "}
-            is already open in another window.
+          <CardContent className="text-sm text-muted-foreground">
+            On your first login, pick a unique @username. Others will use it to find and message you.
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="flex gap-2">
-              <CodeIcon />
-              Change the backend
+            <CardTitle className="flex gap-2 text-base">
+              <ChatBubbleIcon /> Start a Chat
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            Edit <Code>convex/messages.ts</Code> to change the backend
-            functionality.
+          <CardContent className="text-sm text-muted-foreground">
+            Search for someone by their @username in the sidebar, then start messaging them directly.
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="flex gap-2">
-              <MagicWandIcon />
-              Change the frontend
+            <CardTitle className="flex gap-2 text-base">
+              <LockClosedIcon /> E2E Encryption
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            Edit <Code>src/App.tsx</Code> to change your frontend.
+          <CardContent className="text-sm text-muted-foreground">
+            Every message is encrypted with a unique key. Not even s.chat can read your messages.
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex gap-2 text-base">
+              🎙️ Voice Notes
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            Tap the microphone icon to record and send encrypted voice notes.
           </CardContent>
         </Card>
       </div>
       <div>
-        <h2 className="mt-6 mb-3 font-semibold">Helpful resources</h2>
-        <div className="grid md:grid-cols-2 gap-3">
-          <Resource title="Convex Docs" href="https://docs.convex.dev/home">
-            Read comprehensive documentation for all Convex features.
-          </Resource>
-          <Resource title="Stack articles" href="https://stack.convex.dev/">
-            Learn about best practices, use cases, and more from a growing
-            collection of articles, videos, and walkthroughs.
-          </Resource>
-          <Resource title="Discord" href="https://www.convex.dev/community">
-            Join our developer community to ask questions, trade tips & tricks,
-            and show off your projects.
-          </Resource>
-          <Resource title="Search them all" href="https://search.convex.dev/">
-            Get unblocked quickly by searching across the docs, Stack, and
-            Discord chats.
-          </Resource>
-        </div>
+        <h2 className="mt-6 mb-3 font-semibold">Tips</h2>
+        <ul className="space-y-2 text-sm text-muted-foreground">
+          <li>• Messages can be set to auto-expire (1 day or 7 days)</li>
+          <li>• Create group chats with multiple people</li>
+          <li>• Add contacts to find people faster</li>
+          <li>• Share your profile link: your app URL + /u/yourhandle</li>
+          <li>• Enable push notifications to never miss a message</li>
+        </ul>
       </div>
     </div>
-  );
-}
-
-function Resource({
-  title,
-  children,
-  href,
-}: {
-  title: string;
-  children: ReactNode;
-  href: string;
-}) {
-  return (
-    <Button
-      asChild
-      variant="secondary"
-      className="flex h-auto flex-col items-start justify-start gap-2 whitespace-normal p-4 font-normal"
-    >
-      <a href={href} target="_blank">
-        <div className="text-sm font-bold flex items-center gap-1">
-          {title}
-          <ExternalLinkIcon />
-        </div>
-        <div className="text-muted-foreground">{children}</div>
-      </a>
-    </Button>
   );
 }

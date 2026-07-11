@@ -4,10 +4,20 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/convex.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>End-to-End Encrypted Chat</title>
+    <meta name="description" content="End-to-end encrypted chat with group messaging, voice notes, and real-time delivery." />
+    <meta name="theme-color" content="#000000" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>s.chat</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js").catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

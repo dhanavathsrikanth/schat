@@ -9,8 +9,12 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as cron from "../cron.js";
+import type * as crons from "../crons.js";
 import type * as files from "../files.js";
+import type * as groups from "../groups.js";
 import type * as http from "../http.js";
+import type * as invitations from "../invitations.js";
 import type * as messages from "../messages.js";
 import type * as users from "../users.js";
 
@@ -22,8 +26,12 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  cron: typeof cron;
+  crons: typeof crons;
   files: typeof files;
+  groups: typeof groups;
   http: typeof http;
+  invitations: typeof invitations;
   messages: typeof messages;
   users: typeof users;
 }>;
