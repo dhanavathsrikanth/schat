@@ -10,6 +10,8 @@ export function SignInForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [verifyEmail, setVerifyEmail] = useState<string | null>(null);
+  const [code, setCode] = useState("");
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,12 +24,69 @@ export function SignInForm() {
       formData.set("password", password.trim());
       formData.set("flow", flow);
       await signIn("password", formData);
+      setVerifyEmail(email.trim());
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to sign in");
+      setError(err instanceof Error ? err.message : "Failed");
     } finally {
       setLoading(false);
     }
   };
+
+  const handleVerifySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!code.trim()) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.set("code", code.trim());
+      formData.set("flow", "email-verification");
+      formData.set("email", verifyEmail!);
+      await signIn("password", formData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid code");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (verifyEmail) {
+    return (
+      <div className="container my-auto">
+        <div className="max-w-[384px] mx-auto flex flex-col my-auto gap-4 pb-8">
+          <h2 className="font-semibold text-2xl tracking-tight">
+            Check your email
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            We sent a verification code to <strong>{verifyEmail}</strong>.
+          </p>
+          <form onSubmit={handleVerifySubmit} className="flex flex-col gap-3">
+            <Input
+              type="text"
+              name="code"
+              placeholder="Enter 8-digit code"
+              value={code}
+              onChange={(e) => { setCode(e.target.value); setError(null); }}
+              autoFocus
+              required
+              maxLength={8}
+            />
+            {error && <p className="text-xs text-destructive">{error}</p>}
+            <Button type="submit" disabled={loading || !code.trim()}>
+              {loading ? "Verifying…" : "Verify"}
+            </Button>
+          </form>
+          <Button
+            className="p-0 self-start"
+            variant="link"
+            onClick={() => { setVerifyEmail(null); setCode(""); setError(null); }}
+          >
+            Back to sign in
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container my-auto">
