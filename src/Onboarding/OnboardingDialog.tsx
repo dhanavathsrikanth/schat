@@ -13,13 +13,14 @@ import {
 } from "@/components/ui/dialog";
 
 export function OnboardingDialog() {
+  const user = useQuery(api.users.viewer);
   const hasProfile = useQuery(api.users.hasProfile);
   const setHandle = useMutation(api.users.setHandle);
   const [handle, setHandleInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  if (hasProfile === undefined || hasProfile === true) return null;
+  if (user === undefined || user === null || hasProfile === undefined || hasProfile === true) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

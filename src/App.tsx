@@ -36,12 +36,12 @@ export default function App() {
       }
     >
       <>
-        <OnboardingDialog />
         {inviteCode ? (
           <InviteLanding code={inviteCode} />
         ) : (
           <>
             <Authenticated>
+              <OnboardingDialog />
               <ChatIntro />
               {user ? <MultiChat viewer={user._id} initialHandle={initialHandle} /> : null}
             </Authenticated>
