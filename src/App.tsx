@@ -18,8 +18,10 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     const handle = params.get("handle");
     const code = params.get("code");
-    if (code) {
+    if (code && code.length <= 16) {
       setInviteCode(code);
+      window.history.replaceState({}, "", window.location.pathname);
+    } else if (code) {
       window.history.replaceState({}, "", window.location.pathname);
     } else if (handle) {
       setInitialHandle(handle);
