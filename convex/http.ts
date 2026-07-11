@@ -57,6 +57,7 @@ http.route({
     }
     const invite = await ctx.runQuery(api.invitations.getByCode, { code });
     const inviterName = invite?.inviterHandle ? `@${invite.inviterHandle}` : invite?.inviterName ?? "Someone";
+    const siteUrl = process.env.SITE_URL || "https://schat-beige.vercel.app";
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,11 +71,11 @@ http.route({
   <meta name="twitter:title" content="${inviterName} invited you to s.chat" />
   <meta name="twitter:description" content="End-to-end encrypted messaging." />
   <script>
-    window.location.href = "/?invite=${code}";
+    window.location.href = "${siteUrl}/?invite=${code}";
   </script>
 </head>
 <body>
-  <p>Redirecting to <a href="/?code=${code}">s.chat invite</a>…</p>
+  <p>Redirecting to <a href="${siteUrl}/?invite=${code}">s.chat invite</a>…</p>
 </body>
 </html>`;
     return new Response(html, {

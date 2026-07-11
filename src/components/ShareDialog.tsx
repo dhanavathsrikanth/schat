@@ -169,7 +169,7 @@ export function ShareDialog({ open, onClose, inviteCode, inviterHandle, searchHa
   const [copied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
-  const baseUrl = import.meta.env.VITE_CONVEX_SITE_URL as string || "";
+  const baseUrl = import.meta.env.VITE_CONVEX_SITE_URL as string || "https://cheery-dog-843.convex.site";
   const inviteUrl = inviteCode ? `${baseUrl}/invite?code=${inviteCode}` : "";
   const shareText = inviterHandle
     ? `Join me on s.chat! I'm @${inviterHandle}. End-to-end encrypted messaging.`
