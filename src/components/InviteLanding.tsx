@@ -35,7 +35,12 @@ export function InviteLanding({ code }: { code: string }) {
       await claimInvite({ code });
       setClaimed(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to accept invite");
+      const msg = err instanceof Error ? err.message : "Failed to accept invite";
+      if (msg.includes("own invite")) {
+        setError("This is your own invite link! Share it with others to connect.");
+      } else {
+        setError(msg);
+      }
     } finally {
       setClaiming(false);
     }
@@ -152,7 +157,16 @@ export function InviteLanding({ code }: { code: string }) {
           <Button onClick={handleClaim} disabled={claiming} size="lg" className="w-full mb-3">
             {claiming ? "Accepting…" : "Accept Invite & Start Chatting"}
           </Button>
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && (
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">{error}</p>
+              {error.includes("your own invite") && (
+                <Button onClick={() => window.location.href = "/"} variant="outline" className="w-full">
+                  Go to Chat
+                </Button>
+              )}
+            </div>
+          )}
         </>
       )}
     </div>
