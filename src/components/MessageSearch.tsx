@@ -5,7 +5,7 @@ import { Id } from "../../convex/_generated/dataModel";
 import { Input } from "@/components/ui/input";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 
-export function MessageSearch({ viewer }: { viewer: Id<"users"> }) {
+export function MessageSearch(_props?: { viewer?: Id<"users"> }) {
   const [query, setQuery] = useState("");
   const results = useQuery(
     api.messages.search,

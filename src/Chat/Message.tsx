@@ -46,7 +46,7 @@ export function Message({
   children: ReactNode;
 }) {
   const isOwn = author === viewer;
-  const [hovering, setHovering] = useState(false);
+  const [, setHovering] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const actionsRef = useRef<HTMLDivElement>(null);

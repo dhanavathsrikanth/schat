@@ -10,7 +10,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  ExternalLinkIcon,
   PersonIcon,
   LockClosedIcon,
   ChatBubbleIcon,

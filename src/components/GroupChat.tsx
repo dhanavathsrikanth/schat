@@ -8,10 +8,8 @@ import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { useKeyPair } from "@/Chat/keyExchange";
 import { MessageList, formatDateSeparator, getDateKey } from "@/Chat/MessageList";
-import { Message } from "@/Chat/Message";
 import { GroupInfoPanel } from "@/components/GroupInfoPanel";
 import { PersonIcon, ArrowLeftIcon, DotsVerticalIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
-import { ForwardDialog } from "@/components/ForwardDialog";
 import { EmojiPicker } from "@/components/EmojiPicker";
 
 export function GroupChat({
@@ -19,7 +17,7 @@ export function GroupChat({
 }: {
   groupId: Id<"groups">; viewer: Id<"users">; onBack?: () => void;
 }) {
-  const group = useQuery(api.groups.list)?.find((g) => g._id === groupId);
+  const group = useQuery(api.groups.list)?.find((g: any) => g._id === groupId) ?? null;
   const messages = useQuery(api.groups.listMessages, { groupId });
   const sendMessage = useMutation(api.groups.sendMessage);
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
@@ -27,7 +25,6 @@ export function GroupChat({
   const deleteMessage = useMutation(api.groups.deleteMessage);
   const markGroupRead = useMutation(api.groups.markGroupRead);
   const { keyPair, deriveSharedSecret } = useKeyPair();
-  const [aesKey, setAesKey] = useState<CryptoKey | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
@@ -46,7 +43,6 @@ export function GroupChat({
   const [mentionSearch, setMentionSearch] = useState("");
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const [forwardMessageId, setForwardMessageId] = useState<string | null>(null);
 
   useEffect(() => {
     if (group) void markGroupRead({ groupId });
@@ -67,8 +63,7 @@ export function GroupChat({
     if (!otherMember) return;
     void (async () => {
       try {
-        const key = await deriveSharedSecret((otherMember as any).key ?? "");
-        if (key) setAesKey(key);
+        await deriveSharedSecret((otherMember as any).key ?? "");
       } catch {}
     })();
   }, [group, deriveSharedSecret, keyPair, viewer]);
@@ -111,7 +106,6 @@ export function GroupChat({
     if (!audioBlob) return;
     setIsSending(true);
     try {
-      const data = await audioBlob.arrayBuffer();
       const uploadUrl = await generateUploadUrl({});
       const response = await fetch(uploadUrl, { method: "POST", headers: { "Content-Type": "audio/webm" }, body: audioBlob });
       if (!response.ok) throw new Error("Upload failed");
@@ -320,13 +314,12 @@ function GroupMessageItem({
 }) {
   const isOwn = message.userId === viewer;
   const [hovering, setHovering] = useState(false);
-  const [showActions, setShowActions] = useState(false);
 
   return (
     <li
       className={`group flex flex-col text-sm mb-0.5 ${isOwn ? "items-end self-end" : "items-start self-start"}`}
       onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => { setHovering(false); setShowActions(false); }}
+      onMouseLeave={() => setHovering(false)}
     >
       {showAuthor && !isOwn && (
         <div className="mb-0.5 px-1 text-xs font-medium text-primary">{message.author}</div>
@@ -366,7 +359,7 @@ function GroupMessageItem({
       </div>
       {message.reactions?.length > 0 && (
         <div className={`mt-0.5 flex flex-wrap gap-0.5 px-1 ${isOwn ? "justify-end" : "justify-start"}`}>
-          {Object.entries(message.reactions.reduce<Record<string, number>>((a, r: any) => ({ ...a, [r.emoji]: (a[r.emoji] ?? 0) + 1 }), {})).map(([emoji, count]) => (
+          {Object.entries((message.reactions as any[]).reduce<Record<string, number>>((a: Record<string, number>, r: any) => ({ ...a, [r.emoji]: (a[r.emoji] ?? 0) + 1 }), {})).map(([emoji, count]) => (
             <span key={emoji} className="rounded-full bg-muted px-1.5 py-0.5 text-[10px]">{emoji} {count > 1 && count}</span>
           ))}
         </div>

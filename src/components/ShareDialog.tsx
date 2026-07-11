@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,7 +13,6 @@ import {
   CheckIcon,
   PersonIcon,
   Share1Icon,
-  EnvelopeClosedIcon,
   LightningBoltIcon,
 } from "@radix-ui/react-icons";
 
@@ -83,7 +80,7 @@ interface ShareDialogProps {
   onClose: () => void;
   inviteCode: string | null;
   inviterHandle: string | null;
-  searchHandle?: string;
+  searchHandle?: string | null;
 }
 
 function QRCode({ value, size = 160 }: { value: string; size?: number }) {

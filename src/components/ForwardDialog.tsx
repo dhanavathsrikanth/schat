@@ -2,17 +2,15 @@ import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PersonIcon, GroupIcon } from "@radix-ui/react-icons";
+import { PersonIcon } from "@radix-ui/react-icons";
 
 export function ForwardDialog({
   messageId,
@@ -24,7 +22,6 @@ export function ForwardDialog({
   onClose: () => void;
 }) {
   const users = useQuery(api.users.list);
-  const groups = useQuery(api.groups.list);
   const forwardMessage = useMutation(api.messages.forward);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);

@@ -3,17 +3,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMutation, useQuery } from "convex/react";
-import { ChangeEvent, FormEvent, useEffect, useRef, useState, useCallback } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { api } from "../../convex/_generated/api";
 import { MessageList, formatDateSeparator, getDateKey } from "@/Chat/MessageList";
 import { Message } from "@/Chat/Message";
 import { Id } from "../../convex/_generated/dataModel";
 import { useKeyPair } from "./keyExchange";
 import { ProfileEditor } from "@/components/ProfileEditor";
-import { PersonIcon, GroupIcon, MagnifyingGlassIcon, ArrowLeftIcon, DotsVerticalIcon, PaperPlaneIcon, Share1Icon } from "@radix-ui/react-icons";
+import { PersonIcon, GroupIcon, MagnifyingGlassIcon, ArrowLeftIcon, DotsVerticalIcon, Share1Icon, Pencil1Icon } from "@radix-ui/react-icons";
 import { CreateGroupDialog } from "@/components/CreateGroupDialog";
 import { GroupChat } from "@/components/GroupChat";
-import { GroupInfoPanel } from "@/components/GroupInfoPanel";
+
 import { MessageSearch } from "@/components/MessageSearch";
 import { ForwardDialog } from "@/components/ForwardDialog";
 import { EmojiPicker } from "@/components/EmojiPicker";
@@ -400,10 +400,6 @@ export function EncryptedChat({
     return () => document.removeEventListener("mousedown", handler);
   }, [showMenu]);
 
-  const handleCopyMessage = useCallback((text: string) => {
-    navigator.clipboard.writeText(text);
-  }, []);
-
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -643,7 +639,7 @@ export function EncryptedChat({
       {/* Edit bar */}
       {editingMessage && !replyTo && (
         <div className="flex items-center gap-2 border-t bg-muted/50 px-4 py-2">
-          <PencilIcon className="h-3.5 w-3.5 text-muted-foreground" />
+          <Pencil1Icon className="h-3.5 w-3.5 text-muted-foreground" />
           <span className="text-xs text-muted-foreground">Editing message</span>
           <button onClick={() => setEditingMessage(null)} className="ml-auto text-xs text-muted-foreground hover:text-foreground">✕</button>
         </div>

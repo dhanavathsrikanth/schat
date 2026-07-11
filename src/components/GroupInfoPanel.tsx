@@ -34,7 +34,7 @@ export function GroupInfoPanel({
   const [memberSearch, setMemberSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const group = groups?.find((g) => g._id === groupId);
+  const group = groups?.find((g: any) => g._id === groupId) ?? null;
   const myRole = group?.role;
   const isAdmin = myRole === "admin";
 
