@@ -169,7 +169,7 @@ export function ShareDialog({ open, onClose, inviteCode, inviterHandle, searchHa
   const [copied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const baseUrl = import.meta.env.VITE_CONVEX_SITE_URL as string || "";
   const inviteUrl = inviteCode ? `${baseUrl}/invite?code=${inviteCode}` : "";
   const shareText = inviterHandle
     ? `Join me on s.chat! I'm @${inviterHandle}. End-to-end encrypted messaging.`
@@ -223,6 +223,13 @@ export function ShareDialog({ open, onClose, inviteCode, inviterHandle, searchHa
               </Button>
             </div>
 
+            {/* Native share — the big primary button */}
+            {hasNativeShare && (
+              <Button onClick={handleNativeShare} className="w-full" size="lg">
+                <Share1Icon className="mr-2 h-4 w-4" /> Share via device
+              </Button>
+            )}
+
             {/* QR Code */}
             <div className="flex flex-col items-center gap-2">
               <Button
@@ -240,33 +247,28 @@ export function ShareDialog({ open, onClose, inviteCode, inviterHandle, searchHa
               )}
             </div>
 
-            {/* Native share button (mobile) */}
-            {hasNativeShare && (
-              <Button onClick={handleNativeShare} className="w-full" size="lg">
-                <Share1Icon className="mr-2 h-4 w-4" /> Share via device
-              </Button>
-            )}
-
             {/* Platform sharing buttons */}
-            <div>
-              <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                {hasNativeShare ? "Or share via" : "Share via"}
-              </p>
-              <div className="grid grid-cols-4 gap-2">
-                {SHARE_PLATFORMS.map((platform) => (
-                  <a
-                    key={platform.name}
-                    href={platform.getUrl(inviteUrl, shareText, shareSubject)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`flex flex-col items-center gap-1 rounded-lg p-2.5 text-center transition-colors ${platform.color}`}
-                  >
-                    <span className="text-xl leading-none">{platform.icon}</span>
-                    <span className="text-[10px] font-medium leading-tight">{platform.name}</span>
-                  </a>
-                ))}
+            {!hasNativeShare && (
+              <div>
+                <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Share via
+                </p>
+                <div className="grid grid-cols-4 gap-2">
+                  {SHARE_PLATFORMS.map((platform) => (
+                    <a
+                      key={platform.name}
+                      href={platform.getUrl(inviteUrl, shareText, shareSubject)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex flex-col items-center gap-1 rounded-lg p-2.5 text-center transition-colors ${platform.color}`}
+                    >
+                      <span className="text-xl leading-none">{platform.icon}</span>
+                      <span className="text-[10px] font-medium leading-tight">{platform.name}</span>
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {searchHandle && (
               <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
