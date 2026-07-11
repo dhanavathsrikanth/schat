@@ -70,7 +70,7 @@ http.route({
   <meta name="twitter:title" content="${inviterName} invited you to s.chat" />
   <meta name="twitter:description" content="End-to-end encrypted messaging." />
   <script>
-    window.location.href = "/?code=${code}";
+    window.location.href = "/?invite=${code}";
   </script>
 </head>
 <body>
