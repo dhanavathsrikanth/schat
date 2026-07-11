@@ -23,6 +23,7 @@ export function SignInForm() {
       formData.set("email", email.trim());
       formData.set("password", password.trim());
       formData.set("flow", flow);
+      formData.set("redirectTo", window.location.origin);
       await signIn("password", formData);
       setVerifyEmail(email.trim());
     } catch (err) {
@@ -42,6 +43,7 @@ export function SignInForm() {
       formData.set("code", code.trim());
       formData.set("flow", "email-verification");
       formData.set("email", verifyEmail!);
+      formData.set("redirectTo", window.location.origin);
       await signIn("password", formData);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid code");
@@ -102,7 +104,7 @@ export function SignInForm() {
           className="flex-1"
           variant="outline"
           type="button"
-          onClick={() => void signIn("google")}
+          onClick={() => void signIn("google", { redirectTo: window.location.origin })}
         >
           <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
