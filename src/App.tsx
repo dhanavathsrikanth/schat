@@ -18,9 +18,11 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     const handle = params.get("handle");
     const invite = params.get("invite");
-    if (invite) {
-      setInviteCode(invite);
-      window.history.replaceState({}, "", window.location.pathname);
+    const code = params.get("code");
+    const isInvitePath = window.location.pathname === "/invite";
+    if (invite || (isInvitePath && code)) {
+      setInviteCode(invite || code);
+      window.history.replaceState({}, "", "/");
     } else if (handle) {
       setInitialHandle(handle);
       window.history.replaceState({}, "", window.location.pathname);
