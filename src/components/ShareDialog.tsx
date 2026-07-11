@@ -197,7 +197,7 @@ export function ShareDialog({ open, onClose, inviteCode, inviterHandle, searchHa
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Share1Icon className="h-5 w-5" />
@@ -215,7 +215,7 @@ export function ShareDialog({ open, onClose, inviteCode, inviterHandle, searchHa
             {/* Invite link */}
             <div className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2">
               <LightningBoltIcon className="h-4 w-4 shrink-0 text-primary" />
-              <span className="min-w-0 flex-1 truncate text-sm font-mono text-muted-foreground">
+              <span className="min-w-0 flex-1 break-all text-sm font-mono text-muted-foreground">
                 {inviteUrl}
               </span>
               <Button size="sm" variant="ghost" className="h-7 shrink-0 px-2" onClick={handleCopyLink}>
@@ -260,9 +260,9 @@ export function ShareDialog({ open, onClose, inviteCode, inviterHandle, searchHa
                       href={platform.getUrl(inviteUrl, shareText, shareSubject)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex flex-col items-center gap-1 rounded-lg p-2.5 text-center transition-colors ${platform.color}`}
+                      className={`flex flex-col items-center gap-1 rounded-lg p-2 text-center transition-colors ${platform.color}`}
                     >
-                      <span className="text-xl leading-none">{platform.icon}</span>
+                      <span className="text-lg leading-none">{platform.icon}</span>
                       <span className="text-[10px] font-medium leading-tight">{platform.name}</span>
                     </a>
                   ))}
